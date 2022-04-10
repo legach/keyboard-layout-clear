@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KeyboardLayoutClear
 {
@@ -10,28 +8,66 @@ namespace KeyboardLayoutClear
     {
         static void Main(string[] args)
         {
-            long targetLayout = 134809609;
-
-            Console.WriteLine("Try to remove: " + targetLayout);
-
-            var klm = new KeyboardLayoutManager();
-
-            var layouts = klm.GetAllKeyboardLayout();
-            Console.WriteLine(string.Join("\n", layouts.Select(l=>$"{l.Id} Lang:{l.LanguageName} Kboard:{l.KeyboardName}")));
-            while (layouts.Any(l=>l.Id == targetLayout))
+            if (args.Length == 0 ||
+                args[0] == "-?" )
             {
-                if (klm.TryToUnloadLayout(targetLayout))
-                {
-                    Console.WriteLine("Success");
-                }
-                else
-                {
-                    Console.WriteLine("Failure");
-                }
+                WriteHelp();
+                return;
             }
 
-            Console.WriteLine("Complete");
-            Console.ReadKey();
+            var klm = new KeyboardLayoutManager();
+            switch (args[0])
+            {
+                case "-s":
+                    ShowAllLayouts(klm);
+                    break;
+                case "-r":
+                    if (args.Length>1 && long.TryParse(args[1], out var id))
+                        RemoveLayout(klm, id);
+                    else
+                        WriteHelp();
+                    break;
+                default:
+                    WriteHelp();
+                    break;
+            }
+
+            return;
+        }
+
+        private static void RemoveLayout(KeyboardLayoutManager klm, long targetLayout)
+        {
+            Console.WriteLine("Try to remove: " + targetLayout);
+            var layouts = klm.GetAllKeyboardLayout().ToList();
+            while (layouts.Any(l => l.Id == targetLayout))
+            {
+                if (klm.TryToUnloadLayout(targetLayout))
+                    Console.WriteLine("Success");
+                else
+                    Console.WriteLine("Failure");
+            }
+        }
+
+        private static void ShowAllLayouts(KeyboardLayoutManager klm)
+        {
+            Console.WriteLine($"Id \t\t Language \t\t Keyboard");
+
+            foreach (var l in klm.GetAllKeyboardLayout())
+            {
+                Console.WriteLine($"{l.Id} \t {l.LanguageName} \t {l.KeyboardName}");
+            }
+        }
+
+        private static void WriteHelp()
+        {
+            var builder = new StringBuilder()
+                .AppendLine("Use one of arguments below:")
+                .AppendLine("\t-s - show all layouts")
+                .AppendLine("\t-r <id> - remove layouts with id")
+                .AppendLine("\t-? or other - show this help");
+            
+                
+            Console.WriteLine(builder);
         }
     }
 }

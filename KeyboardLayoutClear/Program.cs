@@ -10,16 +10,27 @@ namespace KeyboardLayoutClear
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, world!");
-            var klw = new KeyboardLayoutWatcher();
+            var targetLayout = 2057;
 
-            klw.KeyboardLayoutChanged += (o, n) =>
+            Console.WriteLine("Try to remove: " + targetLayout);
+
+            var klm = new KeyboardLayoutManager();
+
+            var layouts = klm.GetAllKeyboardLayout();
+            Console.WriteLine(string.Join("\n", layouts));
+            while (layouts.Contains(targetLayout))
             {
-                Console.WriteLine($"{o} -> {n}"); // old and new KB layout
-            };
+                if (klm.TryToUnloadLayout(targetLayout))
+                {
+                    Console.WriteLine("Success");
+                }
+                else
+                {
+                    Console.WriteLine("Failure");
+                }
+            }
 
-            
-
+            Console.WriteLine("Complete");
             Console.ReadKey();
         }
     }

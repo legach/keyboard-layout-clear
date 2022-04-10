@@ -42,6 +42,7 @@ namespace KeyboardLayoutClear
             }
             catch (Exception ex)
             {
+                Console.WriteLine("! Exception: " + ex.Message);
                 // if something goes wrong - just assume English
                 return 1033;
             }

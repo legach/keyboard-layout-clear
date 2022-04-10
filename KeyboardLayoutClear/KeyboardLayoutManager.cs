@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,7 +11,7 @@ namespace KeyboardLayoutClear
     class KeyboardLayoutManager
     {
         [DllImport("user32.dll")] static extern bool UnloadKeyboardLayout(IntPtr hkl);
-        public bool TryToUnloadLayout(int id)
+        public bool TryToUnloadLayout(long id)
         {
             try
             {
@@ -26,7 +27,7 @@ namespace KeyboardLayoutClear
 
         [DllImport("user32.dll")] static extern UInt32 GetKeyboardLayoutList(Int32 nBuff, IntPtr[] lpList);
 
-        public IEnumerable<int> GetAllKeyboardLayout()
+        public IEnumerable<LayoutModel> GetAllKeyboardLayout()
         {
             var count = GetKeyboardLayoutList(0, null);
             var keyboardLayoutIds = new IntPtr[count];
@@ -34,8 +35,12 @@ namespace KeyboardLayoutClear
 
             foreach (var item in keyboardLayoutIds)
             {
-                yield return item.ToInt32() & 0xFFFF;
+                yield return new LayoutModel(item.ToInt64(),
+                    CultureInfo.GetCultureInfo(item.ToInt32() & 0xFFFF).DisplayName,
+                    CultureInfo.GetCultureInfo(item.ToInt32() >> 16).DisplayName);
             }
         }
+
+
     }
 }

@@ -22,8 +22,16 @@ namespace KeyboardLayoutClear
                     ShowAllLayouts(klm);
                     break;
                 case "-r":
-                    if (args.Length>1 && long.TryParse(args[1], out var id))
-                        RemoveLayout(klm, id);
+                    if (args.Length > 1)
+                    {
+                        foreach (var idString in args.Skip(1))
+                        {
+                            if (long.TryParse(idString, out var id))
+                            {
+                                RemoveLayout(klm, id);
+                            }
+                        }
+                    }
                     else
                         WriteHelp();
                     break;
@@ -37,9 +45,8 @@ namespace KeyboardLayoutClear
 
         private static void RemoveLayout(KeyboardLayoutManager klm, long targetLayout)
         {
-            Console.WriteLine("Try to remove: " + targetLayout);
-            var layouts = klm.GetAllKeyboardLayout().ToList();
-            while (layouts.Any(l => l.Id == targetLayout))
+            Console.Write("Try to remove: " + targetLayout + " ..... ");
+            while (klm.GetAllKeyboardLayout().Any(l => l.Id == targetLayout))
             {
                 if (klm.TryToUnloadLayout(targetLayout))
                     Console.WriteLine("Success");

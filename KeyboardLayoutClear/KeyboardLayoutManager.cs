@@ -32,9 +32,18 @@ namespace KeyboardLayoutClear
 
             foreach (var item in keyboardLayoutIds)
             {
-                yield return new LayoutModel(item.ToInt64(),
-                    CultureInfo.GetCultureInfo(item.ToInt32() & 0xFFFF).DisplayName,
-                    CultureInfo.GetCultureInfo(item.ToInt32() >> 16).DisplayName);
+                var languageNameId = item.ToInt32() & 0xFFFF;
+                var languageName = languageNameId > 0
+                    ? CultureInfo.GetCultureInfo(languageNameId).DisplayName
+                    : "Unknown";
+
+                var keyboardNameId = item.ToInt32() >> 16;
+                var keyboardName = keyboardNameId > 0 
+                    ? CultureInfo.GetCultureInfo(keyboardNameId).DisplayName 
+                    : "Unknown";
+
+
+                yield return new LayoutModel(item.ToInt64(), languageName, keyboardName);
             }
         }
 
